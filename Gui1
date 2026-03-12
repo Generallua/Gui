@@ -3,7 +3,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
--- ฟังก์ชันช่วยสำหรับทำให้ลาก GUI ได้
+-- Helper function to make UI elements draggable
 local function MakeDraggable(DraggableObject, TargetObject)
     TargetObject = TargetObject or DraggableObject
     local dragging, dragInput, dragStart, startPos
@@ -43,11 +43,12 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     ScreenGui.Parent = CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- 🔵 ปุ่มเปิด-ปิด (ลอยอยู่ตลอดเวลา)
+    -- 🔵 Floating Toggle Button
     local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleBtn"
     ToggleBtn.Parent = ScreenGui
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    ToggleBtn.BackgroundTransparency = 0.2
     ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
     ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
     ToggleBtn.AutoButtonColor = true
@@ -72,12 +73,12 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     MakeDraggable(ToggleBtn)
 
-    -- 🔵 Main Frame
+    -- 🔵 Main Frame (Background)
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(76, 76, 76)
-    MainFrame.BackgroundTransparency = 0.1
+    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.BackgroundTransparency = 0.3 -- Translucent background
     MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
     MainFrame.Size = UDim2.new(0, 500, 0, 350)
     MainFrame.BorderSizePixel = 0
@@ -89,16 +90,19 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
+    -- 🔵 Drag Bar (TopBar)
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
-    TopBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    TopBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    TopBar.BackgroundTransparency = 0.3 -- Slightly lighter and translucent
     TopBar.Size = UDim2.new(1, 0, 0, 30)
     Instance.new("UICorner", TopBar)
     
     local TopBarFix = Instance.new("Frame")
     TopBarFix.Parent = TopBar
-    TopBarFix.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    TopBarFix.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    TopBarFix.BackgroundTransparency = 0.3
     TopBarFix.Position = UDim2.new(0, 0, 0.5, 0)
     TopBarFix.Size = UDim2.new(1, 0, 0.5, 0)
     TopBarFix.BorderSizePixel = 0
@@ -116,11 +120,12 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     MakeDraggable(TopBar, MainFrame)
 
+    -- 🔵 Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
     Sidebar.Parent = MainFrame
-    Sidebar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    Sidebar.BackgroundTransparency = 0.5
+    Sidebar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Sidebar.BackgroundTransparency = 0.4
     Sidebar.Position = UDim2.new(0.02, 0, 0.12, 0)
     Sidebar.Size = UDim2.new(0.25, 0, 0.84, 0)
     Sidebar.BorderSizePixel = 0
@@ -135,6 +140,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     local SidebarPadding = Instance.new("UIPadding", Sidebar)
     SidebarPadding.PaddingTop = UDim.new(0, 10)
 
+    -- 🔵 Content Container
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Parent = MainFrame
@@ -149,7 +155,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
         local CategoryBtn = Instance.new("TextButton")
         CategoryBtn.Parent = Sidebar
-        CategoryBtn.BackgroundColor3 = Color3.fromRGB(73, 73, 73)
+        CategoryBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        CategoryBtn.BackgroundTransparency = 0.3
         CategoryBtn.Size = UDim2.new(0.9, 0, 0, 30)
         CategoryBtn.Font = Enum.Font.GothamBold
         CategoryBtn.Text = CategoryName
@@ -173,7 +180,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         local PagePadding = Instance.new("UIPadding", CategoryPage)
         PagePadding.PaddingTop = UDim.new(0, 5)
 
-        -- 🟢 ระบบคำนวณแถบเลื่อนอัตโนมัติ 100% (แก้ปัญหาเลื่อนไม่สุด)
+        -- Auto adjust scrolling frame canvas size
         PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             CategoryPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
         end)
@@ -183,10 +190,10 @@ function Library:CreateWindow(WindowName, ToggleConfig)
                 if page:IsA("ScrollingFrame") then page.Visible = false end
             end
             for _, btn in pairs(Sidebar:GetChildren()) do
-                if btn:IsA("TextButton") then btn.BackgroundColor3 = Color3.fromRGB(73, 73, 73) end
+                if btn:IsA("TextButton") then btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80) end
             end
             CategoryPage.Visible = true
-            TweenService:Create(CategoryBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(90, 90, 90)}):Play()
+            TweenService:Create(CategoryBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}):Play()
         end
 
         CategoryBtn.MouseButton1Click:Connect(SelectTab)
@@ -216,7 +223,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         function CategoryElements:CreateButton(ButtonText, Callback)
             local ActionBtn = Instance.new("TextButton")
             ActionBtn.Parent = CategoryPage
-            ActionBtn.BackgroundColor3 = Color3.fromRGB(73, 73, 73)
+            ActionBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+            ActionBtn.BackgroundTransparency = 0.2
             ActionBtn.Size = UDim2.new(0.95, 0, 0, 35)
             ActionBtn.Font = Enum.Font.Gotham
             ActionBtn.Text = ButtonText
@@ -236,7 +244,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             local CurrentState = DefaultState or false
             local ToggleContainer = Instance.new("TextButton")
             ToggleContainer.Parent = CategoryPage
-            ToggleContainer.BackgroundColor3 = Color3.fromRGB(73, 73, 73)
+            ToggleContainer.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+            ToggleContainer.BackgroundTransparency = 0.2
             ToggleContainer.Size = UDim2.new(0.95, 0, 0, 35)
             ToggleContainer.Text = ""
             ToggleContainer.AutoButtonColor = false
@@ -290,7 +299,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             local CurrentValue = Default or Min
             local SliderContainer = Instance.new("Frame")
             SliderContainer.Parent = CategoryPage
-            SliderContainer.BackgroundColor3 = Color3.fromRGB(73, 73, 73)
+            SliderContainer.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+            SliderContainer.BackgroundTransparency = 0.2
             SliderContainer.Size = UDim2.new(0.95, 0, 0, 50)
             Instance.new("UICorner", SliderContainer)
 
@@ -362,8 +372,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             local isOpen = false
             local DropdownContainer = Instance.new("Frame")
             DropdownContainer.Parent = CategoryPage
-            DropdownContainer.BackgroundColor3 = Color3.fromRGB(73, 73, 73)
-            DropdownContainer.BackgroundTransparency = 0
+            DropdownContainer.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+            DropdownContainer.BackgroundTransparency = 0.2 -- Slightly lighter than background
             DropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
             DropdownContainer.ClipsDescendants = true
             Instance.new("UICorner", DropdownContainer)
@@ -373,7 +383,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             DropdownBtn.BackgroundTransparency = 1
             DropdownBtn.Size = UDim2.new(1, 0, 0, 35)
             DropdownBtn.Font = Enum.Font.Gotham
-            DropdownBtn.Text = "  " .. DropdownText .. " : เลือกไอเทม"
+            DropdownBtn.Text = "  " .. DropdownText .. " : Select Option"
             DropdownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
             DropdownBtn.TextSize = 14
             DropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
@@ -390,8 +400,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
             local OptionList = Instance.new("Frame")
             OptionList.Parent = DropdownContainer
-            OptionList.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            OptionList.BackgroundTransparency = 0
+            OptionList.BackgroundColor3 = Color3.fromRGB(75, 75, 75)
+            OptionList.BackgroundTransparency = 0.2
             OptionList.Position = UDim2.new(0, 0, 0, 35)
             OptionList.Size = UDim2.new(1, 0, 1, -35)
 
@@ -412,8 +422,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             for _, option in ipairs(Options) do
                 local OptionBtn = Instance.new("TextButton")
                 OptionBtn.Parent = OptionList
-                OptionBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
-                OptionBtn.BackgroundTransparency = 0
+                OptionBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+                OptionBtn.BackgroundTransparency = 0.2
                 OptionBtn.BorderSizePixel = 0
                 OptionBtn.Size = UDim2.new(1, 0, 0, 30)
                 OptionBtn.Font = Enum.Font.Gotham
@@ -421,8 +431,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
                 OptionBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
                 OptionBtn.TextSize = 14
                 
-                OptionBtn.MouseEnter:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80) end)
-                OptionBtn.MouseLeave:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 65) end)
+                OptionBtn.MouseEnter:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(95, 95, 95) end)
+                OptionBtn.MouseLeave:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80) end)
                 
                 OptionBtn.MouseButton1Click:Connect(function()
                     DropdownBtn.Text = "  " .. DropdownText .. " : " .. option
