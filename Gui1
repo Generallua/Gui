@@ -3,7 +3,6 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
--- Helper function to make UI elements draggable
 local function MakeDraggable(DraggableObject, TargetObject)
     TargetObject = TargetObject or DraggableObject
     local dragging, dragInput, dragStart, startPos
@@ -43,7 +42,6 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     ScreenGui.Parent = CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- 🔵 Floating Toggle Button
     local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleBtn"
     ToggleBtn.Parent = ScreenGui
@@ -73,12 +71,11 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     MakeDraggable(ToggleBtn)
 
-    -- 🔵 Main Frame (Background)
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    MainFrame.BackgroundTransparency = 0.3 -- Translucent background
+    MainFrame.BackgroundTransparency = 0.3
     MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
     MainFrame.Size = UDim2.new(0, 500, 0, 350)
     MainFrame.BorderSizePixel = 0
@@ -90,12 +87,11 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- 🔵 Drag Bar (TopBar)
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
     TopBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    TopBar.BackgroundTransparency = 0.3 -- Slightly lighter and translucent
+    TopBar.BackgroundTransparency = 0.3
     TopBar.Size = UDim2.new(1, 0, 0, 30)
     Instance.new("UICorner", TopBar)
     
@@ -120,8 +116,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     MakeDraggable(TopBar, MainFrame)
 
-    -- 🔵 Sidebar
-    local Sidebar = Instance.new("Frame")
+    local Sidebar = Instance.new("ScrollingFrame")
     Sidebar.Name = "Sidebar"
     Sidebar.Parent = MainFrame
     Sidebar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -129,6 +124,8 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     Sidebar.Position = UDim2.new(0.02, 0, 0.12, 0)
     Sidebar.Size = UDim2.new(0.25, 0, 0.84, 0)
     Sidebar.BorderSizePixel = 0
+    Sidebar.ScrollBarThickness = 0
+    Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
     Instance.new("UICorner", Sidebar)
     Instance.new("UIStroke", Sidebar)
 
@@ -140,7 +137,10 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     local SidebarPadding = Instance.new("UIPadding", Sidebar)
     SidebarPadding.PaddingTop = UDim.new(0, 10)
 
-    -- 🔵 Content Container
+    SidebarList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Sidebar.CanvasSize = UDim2.new(0, 0, 0, SidebarList.AbsoluteContentSize.Y + 20)
+    end)
+
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Parent = MainFrame
@@ -180,7 +180,6 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         local PagePadding = Instance.new("UIPadding", CategoryPage)
         PagePadding.PaddingTop = UDim.new(0, 5)
 
-        -- Auto adjust scrolling frame canvas size
         PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             CategoryPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
         end)
@@ -373,7 +372,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
             local DropdownContainer = Instance.new("Frame")
             DropdownContainer.Parent = CategoryPage
             DropdownContainer.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-            DropdownContainer.BackgroundTransparency = 0.2 -- Slightly lighter than background
+            DropdownContainer.BackgroundTransparency = 0.2
             DropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
             DropdownContainer.ClipsDescendants = true
             Instance.new("UICorner", DropdownContainer)
