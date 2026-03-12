@@ -165,13 +165,19 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         CategoryPage.Visible = false
         
         -- ⭐ ส่วนที่ทำให้เลื่อนหน้าจออัตโนมัติเมื่อไอเทมเยอะเกินไป
-        CategoryPage.CanvasSize = UDim2.new(0, 0, 0, 0)
-        CategoryPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
+                CategoryPage.CanvasSize = UDim2.new(0, 0, 0, 0)
         
         local PageLayout = Instance.new("UIListLayout", CategoryPage)
         PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
         PageLayout.Padding = UDim.new(0, 5)
         PageLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+        -- 🟢 โค้ดแก้ปัญหา Scroll ไม่สุด (อัปเดตอัตโนมัติ 100%)
+        PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            -- คำนวณความสูงทั้งหมดของของที่อยู่ข้างใน แล้วเผื่อพื้นที่ด้านล่างไว้ 20 พิกเซล
+            CategoryPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
+        end)
+
 
         local PagePadding = Instance.new("UIPadding", CategoryPage)
         PagePadding.PaddingTop = UDim.new(0, 5)
@@ -436,4 +442,3 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     return WindowElements
 end
-
