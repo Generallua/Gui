@@ -551,7 +551,6 @@ function Library:CreateWindow(WindowName, Config)
             SearchIcon.BackgroundTransparency = 1
             SearchIcon.Position = UDim2.new(0, 10, 0.5, -10)
             SearchIcon.Size = UDim2.new(0, 20, 0, 20)
-            SearchIcon.Image = ""
             ApplyTextColor(SearchIcon, "ImageColor3")
 
             local TextBox = Instance.new("TextBox")
