@@ -33,8 +33,9 @@ local function MakeDraggable(DraggableObject, TargetObject)
     end)
 end
 
-function Library:CreateWindow(WindowName, ToggleConfig)
-    ToggleConfig = ToggleConfig or {}
+function Library:CreateWindow(WindowName, Config)
+    Config = Config or {}
+    local ToggleConfig = Config.ToggleConfig or {}
     local isFirstTab = true
     
     local ScreenGui = Instance.new("ScreenGui")
@@ -42,6 +43,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     ScreenGui.Parent = CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+    -- [ Toggle Button ]
     local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleBtn"
     ToggleBtn.Parent = ScreenGui
@@ -71,11 +73,13 @@ function Library:CreateWindow(WindowName, ToggleConfig)
 
     MakeDraggable(ToggleBtn)
 
+    -- [ Main Frame ]
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    MainFrame.BackgroundTransparency = 0.3
+    -- ซ่อนสีพื้นหลังเดิมถ้าระบุรูปพื้นหลังมา
+    MainFrame.BackgroundTransparency = (Config.BackgroundImage and Config.BackgroundImage ~= "") and 1 or 0.3
     MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
     MainFrame.Size = UDim2.new(0, 500, 0, 350)
     MainFrame.BorderSizePixel = 0
@@ -83,16 +87,32 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     local MainStroke = Instance.new("UIStroke", MainFrame)
     MainStroke.Thickness = 2
 
+    -- [ Background Image ]
+    if Config.BackgroundImage and Config.BackgroundImage ~= "" then
+        local BgImage = Instance.new("ImageLabel")
+        BgImage.Name = "BackgroundImage"
+        BgImage.Parent = MainFrame
+        BgImage.Size = UDim2.new(1, 0, 1, 0)
+        BgImage.BackgroundTransparency = 1
+        BgImage.Image = Config.BackgroundImage
+        BgImage.ImageTransparency = Config.ImageTransparency or 0.2
+        BgImage.ScaleType = Enum.ScaleType.Crop
+        BgImage.ZIndex = 0 -- ให้อยู่ด้านหลังสุด
+        Instance.new("UICorner", BgImage)
+    end
+
     ToggleBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = not MainFrame.Visible
     end)
 
+    -- [ TopBar ]
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
     TopBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     TopBar.BackgroundTransparency = 0.3
     TopBar.Size = UDim2.new(1, 0, 0, 30)
+    TopBar.ZIndex = 2
     Instance.new("UICorner", TopBar)
     
     local TopBarFix = Instance.new("Frame")
@@ -102,20 +122,76 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     TopBarFix.Position = UDim2.new(0, 0, 0.5, 0)
     TopBarFix.Size = UDim2.new(1, 0, 0.5, 0)
     TopBarFix.BorderSizePixel = 0
+    TopBarFix.ZIndex = 2
+
+    -- [ Logo on TopLeft ]
+    local TitlePadding = 15
+    if Config.Logo and Config.Logo ~= "" then
+        local LogoImg = Instance.new("ImageLabel")
+        LogoImg.Parent = TopBar
+        LogoImg.BackgroundTransparency = 1
+        LogoImg.Position = UDim2.new(0, 8, 0, 5)
+        LogoImg.Size = UDim2.new(0, 20, 0, 20)
+        LogoImg.Image = Config.Logo
+        LogoImg.ZIndex = 3
+        TitlePadding = 35 -- เว้นระยะให้ข้อความหลบโลโก้
+    end
 
     local TitleLabel = Instance.new("TextLabel")
     TitleLabel.Parent = TopBar
     TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.Position = UDim2.new(0, TitlePadding, 0, 0)
     TitleLabel.Size = UDim2.new(0.8, 0, 1, 0)
     TitleLabel.Text = WindowName or "LMG2L Library"
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextSize = 14
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.ZIndex = 3
 
     MakeDraggable(TopBar, MainFrame)
 
+    -- [ Resize Button BottomRight ]
+    local ResizeBtn = Instance.new("TextButton")
+    ResizeBtn.Name = "ResizeBtn"
+    ResizeBtn.Parent = MainFrame
+    ResizeBtn.BackgroundTransparency = 1
+    ResizeBtn.Position = UDim2.new(1, -20, 1, -20)
+    ResizeBtn.Size = UDim2.new(0, 20, 0, 20)
+    ResizeBtn.Font = Enum.Font.GothamBold
+    ResizeBtn.Text = "◢"
+    ResizeBtn.TextColor3 = Color3.fromRGB(115, 196, 237)
+    ResizeBtn.TextSize = 16
+    ResizeBtn.ZIndex = 10
+
+    local resizing = false
+    local resizeStart, startSize
+
+    ResizeBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = true
+            resizeStart = input.Position
+            startSize = MainFrame.AbsoluteSize
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - resizeStart
+            -- กำหนดขนาด Minimum ให้กับ UI (กว้าง 350, สูง 250)
+            local newWidth = math.clamp(startSize.X + delta.X, 350, 800) 
+            local newHeight = math.clamp(startSize.Y + delta.Y, 250, 600)
+            MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = false
+        end
+    end)
+
+    -- [ Sidebar ]
     local Sidebar = Instance.new("ScrollingFrame")
     Sidebar.Name = "Sidebar"
     Sidebar.Parent = MainFrame
@@ -126,6 +202,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
     Sidebar.BorderSizePixel = 0
     Sidebar.ScrollBarThickness = 0
     Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Sidebar.ZIndex = 2
     Instance.new("UICorner", Sidebar)
     Instance.new("UIStroke", Sidebar)
 
@@ -141,12 +218,14 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         Sidebar.CanvasSize = UDim2.new(0, 0, 0, SidebarList.AbsoluteContentSize.Y + 20)
     end)
 
+    -- [ Content Container ]
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Parent = MainFrame
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Position = UDim2.new(0.29, 0, 0.12, 0)
     ContentContainer.Size = UDim2.new(0.69, 0, 0.84, 0)
+    ContentContainer.ZIndex = 2
 
     local WindowElements = {}
 
@@ -162,6 +241,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         CategoryBtn.Text = CategoryName
         CategoryBtn.TextColor3 = Color3.fromRGB(115, 196, 237)
         CategoryBtn.TextSize = 14
+        CategoryBtn.ZIndex = 3
         Instance.new("UICorner", CategoryBtn)
 
         local CategoryPage = Instance.new("ScrollingFrame")
@@ -171,6 +251,7 @@ function Library:CreateWindow(WindowName, ToggleConfig)
         CategoryPage.ScrollBarThickness = 4
         CategoryPage.Visible = false
         CategoryPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+        CategoryPage.ZIndex = 3
         
         local PageLayout = Instance.new("UIListLayout", CategoryPage)
         PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
