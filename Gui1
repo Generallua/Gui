@@ -1,3 +1,6 @@
+-- ====================================================== --
+-- 1. ส่วนของไลบรารี (UI Library Core)
+-- ====================================================== --
 local Library = {}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -43,7 +46,7 @@ function Library:CreateWindow(WindowName, Config)
     ScreenGui.Parent = CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- [ Toggle Button ]
+    -- [ปุ่ม Toggle UI]
     local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleBtn"
     ToggleBtn.Parent = ScreenGui
@@ -73,12 +76,11 @@ function Library:CreateWindow(WindowName, Config)
 
     MakeDraggable(ToggleBtn)
 
-    -- [ Main Frame ]
+    -- [หน้าต่างหลัก MainFrame]
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    -- ซ่อนสีพื้นหลังเดิมถ้าระบุรูปพื้นหลังมา
     MainFrame.BackgroundTransparency = (Config.BackgroundImage and Config.BackgroundImage ~= "") and 1 or 0.3
     MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
     MainFrame.Size = UDim2.new(0, 500, 0, 350)
@@ -87,7 +89,7 @@ function Library:CreateWindow(WindowName, Config)
     local MainStroke = Instance.new("UIStroke", MainFrame)
     MainStroke.Thickness = 2
 
-    -- [ Background Image ]
+    -- [รูปพื้นหลัง Background Image]
     if Config.BackgroundImage and Config.BackgroundImage ~= "" then
         local BgImage = Instance.new("ImageLabel")
         BgImage.Name = "BackgroundImage"
@@ -97,7 +99,7 @@ function Library:CreateWindow(WindowName, Config)
         BgImage.Image = Config.BackgroundImage
         BgImage.ImageTransparency = Config.ImageTransparency or 0.2
         BgImage.ScaleType = Enum.ScaleType.Crop
-        BgImage.ZIndex = 0 -- ให้อยู่ด้านหลังสุด
+        BgImage.ZIndex = 0
         Instance.new("UICorner", BgImage)
     end
 
@@ -105,26 +107,26 @@ function Library:CreateWindow(WindowName, Config)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- [ TopBar ]
+    -- [แถบด้านบน TopBar - ปรับให้ทึบแสงแล้ว]
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
-    TopBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    TopBar.BackgroundTransparency = 0.3
+    TopBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    TopBar.BackgroundTransparency = 0 -- ทึบแสง 100%
     TopBar.Size = UDim2.new(1, 0, 0, 30)
     TopBar.ZIndex = 2
     Instance.new("UICorner", TopBar)
     
     local TopBarFix = Instance.new("Frame")
     TopBarFix.Parent = TopBar
-    TopBarFix.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    TopBarFix.BackgroundTransparency = 0.3
+    TopBarFix.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    TopBarFix.BackgroundTransparency = 0 -- ทึบแสง 100%
     TopBarFix.Position = UDim2.new(0, 0, 0.5, 0)
     TopBarFix.Size = UDim2.new(1, 0, 0.5, 0)
     TopBarFix.BorderSizePixel = 0
     TopBarFix.ZIndex = 2
 
-    -- [ Logo on TopLeft ]
+    -- [โลโก้ Logo]
     local TitlePadding = 15
     if Config.Logo and Config.Logo ~= "" then
         local LogoImg = Instance.new("ImageLabel")
@@ -134,7 +136,7 @@ function Library:CreateWindow(WindowName, Config)
         LogoImg.Size = UDim2.new(0, 20, 0, 20)
         LogoImg.Image = Config.Logo
         LogoImg.ZIndex = 3
-        TitlePadding = 35 -- เว้นระยะให้ข้อความหลบโลโก้
+        TitlePadding = 35
     end
 
     local TitleLabel = Instance.new("TextLabel")
@@ -151,7 +153,7 @@ function Library:CreateWindow(WindowName, Config)
 
     MakeDraggable(TopBar, MainFrame)
 
-    -- [ Resize Button BottomRight ]
+    -- [ปุ่มย่อขยาย Resize Button]
     local ResizeBtn = Instance.new("TextButton")
     ResizeBtn.Name = "ResizeBtn"
     ResizeBtn.Parent = MainFrame
@@ -178,7 +180,6 @@ function Library:CreateWindow(WindowName, Config)
     UserInputService.InputChanged:Connect(function(input)
         if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - resizeStart
-            -- กำหนดขนาด Minimum ให้กับ UI (กว้าง 350, สูง 250)
             local newWidth = math.clamp(startSize.X + delta.X, 350, 800) 
             local newHeight = math.clamp(startSize.Y + delta.Y, 250, 600)
             MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
@@ -191,7 +192,7 @@ function Library:CreateWindow(WindowName, Config)
         end
     end)
 
-    -- [ Sidebar ]
+    -- [เมนูด้านซ้าย Sidebar]
     local Sidebar = Instance.new("ScrollingFrame")
     Sidebar.Name = "Sidebar"
     Sidebar.Parent = MainFrame
@@ -218,7 +219,7 @@ function Library:CreateWindow(WindowName, Config)
         Sidebar.CanvasSize = UDim2.new(0, 0, 0, SidebarList.AbsoluteContentSize.Y + 20)
     end)
 
-    -- [ Content Container ]
+    -- [พื้นที่ใส่เนื้อหา Content Container]
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Parent = MainFrame
@@ -529,4 +530,3 @@ function Library:CreateWindow(WindowName, Config)
     return WindowElements
 end
 
-return Library
