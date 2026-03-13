@@ -273,7 +273,7 @@ function Library:CreateWindow(WindowName, Config)
             isFirstTab = false
         end
 
-        function CategoryElements:CreateLabel(Text)
+        function CategoryElements:CreateLabel(Text, TextColor)
             local LabelContainer = Instance.new("Frame")
             LabelContainer.Parent = CategoryPage
             LabelContainer.BackgroundTransparency = 1
@@ -285,12 +285,17 @@ function Library:CreateWindow(WindowName, Config)
             LabelText.Size = UDim2.new(1, 0, 1, 0)
             LabelText.Font = Enum.Font.GothamBold
             LabelText.Text = Text
-            LabelText.TextColor3 = Color3.fromRGB(200, 200, 200)
+            LabelText.TextColor3 = TextColor or Color3.fromRGB(200, 200, 200)
             LabelText.TextSize = 14
             LabelText.TextXAlignment = Enum.TextXAlignment.Left
         end
 
-        function CategoryElements:CreateButton(ButtonText, Callback)
+        function CategoryElements:CreateButton(ButtonText, TextColor, Callback)
+            if type(TextColor) == "function" then
+                Callback = TextColor
+                TextColor = Color3.fromRGB(255, 255, 255)
+            end
+
             local ActionBtn = Instance.new("TextButton")
             ActionBtn.Parent = CategoryPage
             ActionBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
@@ -298,7 +303,7 @@ function Library:CreateWindow(WindowName, Config)
             ActionBtn.Size = UDim2.new(0.95, 0, 0, 35)
             ActionBtn.Font = Enum.Font.Gotham
             ActionBtn.Text = ButtonText
-            ActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ActionBtn.TextColor3 = TextColor or Color3.fromRGB(255, 255, 255)
             ActionBtn.TextSize = 14
             Instance.new("UICorner", ActionBtn)
 
@@ -307,6 +312,84 @@ function Library:CreateWindow(WindowName, Config)
                 task.wait(0.1)
                 TweenService:Create(ActionBtn, TweenInfo.new(0.1), {Size = UDim2.new(0.95, 0, 0, 35)}):Play()
                 if Callback then Callback() end
+            end)
+        end
+
+        function CategoryElements:CreateTextbox(TextboxText, Placeholder, Callback)
+            local TextboxContainer = Instance.new("Frame")
+            TextboxContainer.Parent = CategoryPage
+            TextboxContainer.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+            TextboxContainer.BackgroundTransparency = 0.2
+            TextboxContainer.Size = UDim2.new(0.95, 0, 0, 35)
+            Instance.new("UICorner", TextboxContainer)
+
+            local TextboxLabel = Instance.new("TextLabel")
+            TextboxLabel.Parent = TextboxContainer
+            TextboxLabel.BackgroundTransparency = 1
+            TextboxLabel.Position = UDim2.new(0, 10, 0, 0)
+            TextboxLabel.Size = UDim2.new(0.5, 0, 1, 0)
+            TextboxLabel.Font = Enum.Font.Gotham
+            TextboxLabel.Text = TextboxText
+            TextboxLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextboxLabel.TextSize = 14
+            TextboxLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+            local TextboxBg = Instance.new("Frame")
+            TextboxBg.Parent = TextboxContainer
+            TextboxBg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            TextboxBg.Position = UDim2.new(1, -160, 0.5, -12)
+            TextboxBg.Size = UDim2.new(0, 150, 0, 24)
+            Instance.new("UICorner", TextboxBg).CornerRadius = UDim.new(0, 4)
+
+            local TextBox = Instance.new("TextBox")
+            TextBox.Parent = TextboxBg
+            TextBox.BackgroundTransparency = 1
+            TextBox.Size = UDim2.new(1, -10, 1, 0)
+            TextBox.Position = UDim2.new(0, 5, 0, 0)
+            TextBox.Font = Enum.Font.Gotham
+            TextBox.PlaceholderText = Placeholder or ""
+            TextBox.Text = ""
+            TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextBox.TextSize = 12
+            TextBox.TextXAlignment = Enum.TextXAlignment.Left
+
+            TextBox.FocusLost:Connect(function()
+                if Callback then Callback(TextBox.Text) end
+            end)
+        end
+
+        function CategoryElements:CreateSearchBar(Placeholder, Callback)
+            local SearchContainer = Instance.new("Frame")
+            SearchContainer.Parent = CategoryPage
+            SearchContainer.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+            SearchContainer.BackgroundTransparency = 0.2
+            SearchContainer.Size = UDim2.new(0.95, 0, 0, 35)
+            Instance.new("UICorner", SearchContainer)
+
+            local SearchIcon = Instance.new("TextLabel")
+            SearchIcon.Parent = SearchContainer
+            SearchIcon.BackgroundTransparency = 1
+            SearchIcon.Position = UDim2.new(0, 10, 0, 0)
+            SearchIcon.Size = UDim2.new(0, 20, 1, 0)
+            SearchIcon.Font = Enum.Font.GothamBold
+            SearchIcon.Text = "🔍"
+            SearchIcon.TextColor3 = Color3.fromRGB(200, 200, 200)
+            SearchIcon.TextSize = 14
+
+            local TextBox = Instance.new("TextBox")
+            TextBox.Parent = SearchContainer
+            TextBox.BackgroundTransparency = 1
+            TextBox.Size = UDim2.new(1, -40, 1, 0)
+            TextBox.Position = UDim2.new(0, 35, 0, 0)
+            TextBox.Font = Enum.Font.Gotham
+            TextBox.PlaceholderText = Placeholder or "Search..."
+            TextBox.Text = ""
+            TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextBox.TextSize = 14
+            TextBox.TextXAlignment = Enum.TextXAlignment.Left
+
+            TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+                if Callback then Callback(TextBox.Text) end
             end)
         end
 
@@ -477,15 +560,46 @@ function Library:CreateWindow(WindowName, Config)
 
             local ListLayout = Instance.new("UIListLayout", OptionList)
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            
+
+            local SearchBox = Instance.new("TextBox")
+            SearchBox.Parent = OptionList
+            SearchBox.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+            SearchBox.BorderSizePixel = 0
+            SearchBox.Size = UDim2.new(1, 0, 0, 30)
+            SearchBox.Font = Enum.Font.Gotham
+            SearchBox.PlaceholderText = "Search in Dropdown..."
+            SearchBox.Text = ""
+            SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SearchBox.TextSize = 14
+
+            local OptionBtns = {}
+
             local function UpdateSize()
-                local targetHeight = isOpen and (35 + (#Options * 30)) or 35
+                local visibleCount = 0
+                for _, btn in ipairs(OptionBtns) do
+                    if btn.Visible then visibleCount = visibleCount + 1 end
+                end
+                local targetHeight = isOpen and (65 + (visibleCount * 30)) or 35
                 TweenService:Create(DropdownContainer, TweenInfo.new(0.2), {Size = UDim2.new(0.95, 0, 0, targetHeight)}):Play()
                 ArrowLabel.Text = isOpen and "-" or "+"
             end
 
             DropdownBtn.MouseButton1Click:Connect(function()
                 isOpen = not isOpen
+                SearchBox.Text = ""
+                for _, btn in ipairs(OptionBtns) do btn.Visible = true end
+                UpdateSize()
+            end)
+
+            SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                local searchText = SearchBox.Text:lower()
+                for _, btn in ipairs(OptionBtns) do
+                    if searchText == "" or string.find(btn.Text:lower(), searchText) then
+                        btn.Visible = true
+                    else
+                        btn.Visible = false
+                    end
+                end
                 UpdateSize()
             end)
 
@@ -500,6 +614,7 @@ function Library:CreateWindow(WindowName, Config)
                 OptionBtn.Text = option
                 OptionBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
                 OptionBtn.TextSize = 14
+                table.insert(OptionBtns, OptionBtn)
                 
                 OptionBtn.MouseEnter:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(95, 95, 95) end)
                 OptionBtn.MouseLeave:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80) end)
