@@ -76,7 +76,7 @@ function Library:CreateWindow(WindowName, Config)
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    MainFrame.BackgroundTransparency = (Config.BackgroundImage and Config.BackgroundImage ~= "") and 1 or 0.3
+    MainFrame.BackgroundTransparency = 0.1
     MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
     MainFrame.Size = UDim2.new(0, 500, 0, 350)
     MainFrame.BorderSizePixel = 0
@@ -421,7 +421,7 @@ function Library:CreateWindow(WindowName, Config)
             end
 
             SliderBg.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch|Touch then
                     dragging = true
                     UpdateSlider(input)
                 end
@@ -519,4 +519,4 @@ function Library:CreateWindow(WindowName, Config)
     return WindowElements
 end
 
-
+return Library
