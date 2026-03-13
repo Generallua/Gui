@@ -1,0 +1,166 @@
+local Library = loadstring(game:HttpGet("https://github.com/Generallua/Gui/raw/refs/heads/main/Gui1"))()
+
+local Window = Library:CreateWindow("Pro Hub V2", {
+    Logo = "rbxassetid://98985755793415",
+    BackgroundImage = "rbxassetid://",
+    ImageTransparency = 0.4,
+    ToggleConfig = {
+        Text = "Open"
+    }
+})
+local MainTab = Window:CreateCategory("🏠 หน้าหลัก")
+local SettingTab = Window:CreateCategory("⚙️ ตั้งค่า")
+local FarmTab = Window:CreateCategory("⚔️ Farm System")
+local PlayerTab = Window:CreateCategory("🏃‍♂️ Character")
+local SettingsTab = Window:CreateCategory("⚙️ Settings")
+
+local CombatTab = Window:CreateCategory("⚔️ Combat")
+local MovementTab = Window:CreateCategory("🏃 Movement")
+local VisualTab = Window:CreateCategory("👁️ Visual")
+local TeleportTab = Window:CreateCategory("🌀 Teleport")
+local FarmingTab = Window:CreateCategory("🌾 Farming")
+local InventoryTab = Window:CreateCategory("🎒 Inventory")
+local SkillsTab = Window:CreateCategory("🔥 Skills")
+local QuestsTab = Window:CreateCategory("📜 Quests")
+local BossTab = Window:CreateCategory("👑 Boss")
+local DungeonTab = Window:CreateCategory("🏰 Dungeon")
+local TradingTab = Window:CreateCategory("💰 Trading")
+local CraftingTab = Window:CreateCategory("🔧 Crafting")
+local UpgradesTab = Window:CreateCategory("⬆️ Upgrades")
+local PetsTab = Window:CreateCategory("🐾 Pets")
+local MountsTab = Window:CreateCategory("🐎 Mounts")
+local MapTab = Window:CreateCategory("🗺️ Map")
+local RadarTab = Window:CreateCategory("📡 Radar")
+local ESPTab = Window:CreateCategory("👁️ ESP")
+local ServerTab = Window:CreateCategory("🌐 Server")
+local RejoinTab = Window:CreateCategory("🔄 Rejoin")
+local GraphicsTab = Window:CreateCategory("🎨 Graphics")
+local AudioTab = Window:CreateCategory("🔊 Audio")
+local MusicTab = Window:CreateCategory("🎵 Music")
+local ChatTab = Window:CreateCategory("💬 Chat")
+local FriendsTab = Window:CreateCategory("👥 Friends")
+local PartyTab = Window:CreateCategory("🎉 Party")
+local GuildTab = Window:CreateCategory("🛡️ Guild")
+local EventsTab = Window:CreateCategory("📅 Events")
+local ExtrasTab = Window:CreateCategory("⭐ Extras")
+local AdminTab = Window:CreateCategory("🛠️ Admin")
+MainTab:CreateLabel("--- ยินดีต้อนรับสู่สคริปต์ของเรา ---") 
+MainTab:CreateLabel("คำเตือน: โซนอันตราย!", Color3.fromRGB(255, 50, 50))
+
+MainTab:CreateButton("กดเพื่อรับเงิน", function()
+    print("คุณได้รับเงินแล้ว!")
+end)
+
+MainTab:CreateButton("ปุ่มสุ่มกาชา", Color3.fromRGB(255, 215, 0), function()
+    print("เกลือ!")
+end)
+
+MainTab:CreateTextbox("ตั้งชื่อสัตว์เลี้ยง", "พิมพ์ชื่อที่นี่...", function(text)
+    print("สัตว์เลี้ยงของคุณชื่อ:", text)
+end)
+
+MainTab:CreateSearchBar("ค้นหาผู้เล่นในเซิร์ฟ...", function(text)
+    print("กำลังค้นหาคำว่า:", text)
+end)
+
+SettingTab:CreateToggle("เปิดระบบล็อคเป้า", false, function(state)
+    if state then
+        print("Auto-Aim: เปิดใช้งาน")
+    else
+        print("Auto-Aim: ปิดใช้งาน")
+    end
+end)
+
+SettingTab:CreateSlider("ความเร็วในการเดิน", 16, 120, 16, function(value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+    print("ตั้งค่าความเร็วเป็น:", value)
+end)
+
+SettingTab:CreateDropdown("เลือกฟาร์มมอนสเตอร์", {"สไลม์", "ก็อบลิน", "ออร์ค", "มังกร"}, function(selected)
+    print("คุณกำลังฟาร์ม:", selected)
+end)
+
+FarmTab:CreateLabel("⭐ Configure Before Starting Farm")
+
+FarmTab:CreateDropdown("Select Weapon", {"Bare Hands", "Wooden Sword", "Katana", "Devil Fruit"}, function(Selected)
+print("System: You selected weapon ->", Selected)
+end)
+
+FarmTab:CreateDropdown("Select Target", {
+"Slime","Goblin","Knight Boss","Black Dragon",
+"Zombie","Skeleton","Fire Demon","Water Demon",
+"Stone Giant","Spirit","Wolf","Spider",
+"Shadow Warrior","Dark Mage","Black Knight","Archer",
+"Hunter","Mage","Lightning Demon","Ice Demon",
+"Slime Boss","Goblin Boss","Dragon Boss","Giant Boss",
+"Demon King","Dragon King","Forest Guardian","Sea Guardian",
+"Soldier","General","Assassin","Swordsman",
+"Shadow Demon","Blood Demon","Spirit Demon","Lava Demon",
+"Robot","Drone","Iron Soldier","Castle Guard",
+"Red Dragon","Blue Dragon","Golden Dragon","Shadow Dragon",
+"Pirate Captain","Pirate","Pirate Minion","Pirate King",
+"Sea Warrior","Sea Demon","Giant Shark","Kraken",
+"Thunder God","Fire God","Water God","Wind God"
+}, function(Selected)
+print("System: Target locked ->", Selected)
+end)
+
+FarmTab:CreateLabel("⚡ Farm Controls")
+
+FarmTab:CreateToggle("Enable Auto Farm", false, function(State)
+if State then
+print("Farming started!")
+else
+print("Farming stopped!")
+end
+end)
+
+FarmTab:CreateButton("Teleport to Safe Zone", function()
+print("Teleporting...")
+end)
+
+PlayerTab:CreateLabel("🛠️ Player Stat Settings")
+
+PlayerTab:CreateSlider("WalkSpeed", 16, 250, 16, function(Value)
+local player = game.Players.LocalPlayer
+if player.Character and player.Character:FindFirstChild("Humanoid") then
+player.Character.Humanoid.WalkSpeed = Value
+end
+end)
+
+PlayerTab:CreateSlider("JumpPower", 50, 500, 50, function(Value)
+local player = game.Players.LocalPlayer
+if player.Character and player.Character:FindFirstChild("Humanoid") then
+player.Character.Humanoid.JumpPower = Value
+end
+end)
+
+PlayerTab:CreateToggle("God Mode", false, function(State)
+print("God Mode State:", State)
+end)
+
+SettingsTab:CreateLabel("🎨 System & Others")
+
+SettingsTab:CreateButton("Remove Fog", function()
+game.Lighting.FogEnd = 100000
+print("Fog removed!")
+end)
+
+SettingsTab:CreateButton("Copy Discord Link", function()
+if setclipboard then
+setclipboard("https://discord.gg/yourlink")
+print("Link copied!")
+else
+print("Your executor does not support clipboard")
+end
+end)
+
+for i = 1,60 do
+SettingsTab:CreateDropdown(
+"Dropdown "..i,
+{"Option 1","Option 2","Option 3","Option 4"},
+function(Selected)
+print("Dropdown "..i.." selected ->",Selected)
+end
+)
+end
