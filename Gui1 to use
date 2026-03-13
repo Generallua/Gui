@@ -1,6 +1,7 @@
+-- https://lucide.dev/icons/
 local Library = loadstring(game:HttpGet("https://github.com/Generallua/Gui/raw/refs/heads/main/Gui1"))()
 
-local Window = Library:CreateWindow("Pro Hub V2", {
+local Window = Library:CreateWindow("PM", {
     Logo = "rbxassetid://98985755793415",
     BackgroundImage = "rbxassetid://",
     ImageTransparency = 0.4,
