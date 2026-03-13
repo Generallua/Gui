@@ -39,7 +39,7 @@ function Library:CreateWindow(WindowName, Config)
     local ToggleConfig = Config.ToggleConfig or {}
     local isFirstTab = true
     
-    -- [ระบบ Theme Color & Rainbow]
+    -- [ระบบ Theme Color (สีของ UI)]
     local ThemeConfig = Config.ThemeColor or Color3.fromRGB(115, 196, 237)
     local isRainbow = false
     local CurrentThemeColor = Color3.fromRGB(115, 196, 237)
@@ -64,15 +64,52 @@ function Library:CreateWindow(WindowName, Config)
         end
     end
 
-    if isRainbow then
+    -- [ระบบ Text Color (สีของข้อความทั้งหมด)]
+    local TextColorConfig = Config.TextColor or Color3.fromRGB(255, 255, 255)
+    local isTextRainbow = false
+    local CurrentTextColor = Color3.fromRGB(255, 255, 255)
+
+    if type(TextColorConfig) == "string" and string.lower(TextColorConfig) == "rainbow" then
+        isTextRainbow = true
+    elseif typeof(TextColorConfig) == "Color3" then
+        CurrentTextColor = TextColorConfig
+    end
+
+    local TextElements = {}
+    local function ApplyTextColor(instance, property)
+        property = property or "TextColor3"
+        instance[property] = CurrentTextColor
+        if isTextRainbow then
+            table.insert(TextElements, {
+                UpdateFunc = function(color)
+                    if instance and instance.Parent then
+                        instance[property] = color
+                    end
+                end
+            })
+        end
+    end
+
+    -- Loop สำหรับสีรุ้ง
+    if isRainbow or isTextRainbow then
         RunService.RenderStepped:Connect(function()
-            CurrentThemeColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-            for _, data in ipairs(ThemedElements) do
-                data.UpdateFunc(CurrentThemeColor)
+            local rColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+            
+            if isRainbow then
+                CurrentThemeColor = rColor
+                for _, data in ipairs(ThemedElements) do
+                    data.UpdateFunc(CurrentThemeColor)
+                end
+            end
+            
+            if isTextRainbow then
+                CurrentTextColor = rColor
+                for _, data in ipairs(TextElements) do
+                    data.UpdateFunc(CurrentTextColor)
+                end
             end
         end)
     end
-    -- [จบระบบ Theme]
     
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "LMG2L_UI"
@@ -105,7 +142,7 @@ function Library:CreateWindow(WindowName, Config)
     ToggleText.Text = ToggleConfig.Text or (ToggleConfig.Image and "" or "UI")
     ToggleText.TextSize = 16
     ToggleText.TextTruncate = Enum.TextTruncate.AtEnd
-    ApplyTheme(ToggleText, "TextColor3")
+    ApplyTextColor(ToggleText)
 
     MakeDraggable(ToggleBtn)
 
@@ -172,14 +209,14 @@ function Library:CreateWindow(WindowName, Config)
     TitleLabel.Parent = TopBar
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Position = UDim2.new(0, TitlePadding, 0, 0)
-    TitleLabel.Size = UDim2.new(1, -TitlePadding - 40, 1, 0) -- เว้นที่ให้ปุ่มย่อขยาย
+    TitleLabel.Size = UDim2.new(1, -TitlePadding - 40, 1, 0)
     TitleLabel.Text = WindowName or "LMG2L Library"
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextSize = 14
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
     TitleLabel.ZIndex = 3
+    ApplyTextColor(TitleLabel)
 
     MakeDraggable(TopBar, MainFrame)
 
@@ -193,7 +230,7 @@ function Library:CreateWindow(WindowName, Config)
     ResizeBtn.Text = "◢"
     ResizeBtn.TextSize = 16
     ResizeBtn.ZIndex = 10
-    ApplyTheme(ResizeBtn, "TextColor3")
+    ApplyTheme(ResizeBtn, "TextColor3") -- อันนี้เป็นสัญลักษณ์ให้ใช้ Theme Color จะสวยกว่า
 
     local resizing = false
     local resizeStart, startSize
@@ -271,7 +308,7 @@ function Library:CreateWindow(WindowName, Config)
         CategoryBtn.TextTruncate = Enum.TextTruncate.AtEnd
         CategoryBtn.ZIndex = 3
         Instance.new("UICorner", CategoryBtn)
-        ApplyTheme(CategoryBtn, "TextColor3")
+        ApplyTextColor(CategoryBtn)
 
         local CategoryPage = Instance.new("ScrollingFrame")
         CategoryPage.Parent = ContentContainer
@@ -324,16 +361,21 @@ function Library:CreateWindow(WindowName, Config)
             LabelText.Size = UDim2.new(1, 0, 1, 0)
             LabelText.Font = Enum.Font.GothamBold
             LabelText.Text = Text
-            LabelText.TextColor3 = TextColor or Color3.fromRGB(200, 200, 200)
             LabelText.TextSize = 14
             LabelText.TextXAlignment = Enum.TextXAlignment.Left
             LabelText.TextTruncate = Enum.TextTruncate.AtEnd
+            
+            if TextColor then
+                LabelText.TextColor3 = TextColor
+            else
+                ApplyTextColor(LabelText)
+            end
         end
 
         function CategoryElements:CreateButton(ButtonText, TextColor, Callback)
             if type(TextColor) == "function" then
                 Callback = TextColor
-                TextColor = Color3.fromRGB(255, 255, 255)
+                TextColor = nil
             end
 
             local ActionBtn = Instance.new("TextButton")
@@ -343,10 +385,15 @@ function Library:CreateWindow(WindowName, Config)
             ActionBtn.Size = UDim2.new(0.95, 0, 0, 35)
             ActionBtn.Font = Enum.Font.Gotham
             ActionBtn.Text = ButtonText
-            ActionBtn.TextColor3 = TextColor or Color3.fromRGB(255, 255, 255)
             ActionBtn.TextSize = 14
             ActionBtn.TextTruncate = Enum.TextTruncate.AtEnd
             Instance.new("UICorner", ActionBtn)
+            
+            if TextColor then
+                ActionBtn.TextColor3 = TextColor
+            else
+                ApplyTextColor(ActionBtn)
+            end
 
             ActionBtn.MouseButton1Click:Connect(function()
                 TweenService:Create(ActionBtn, TweenInfo.new(0.1), {Size = UDim2.new(0.9, 0, 0, 33)}):Play()
@@ -371,10 +418,10 @@ function Library:CreateWindow(WindowName, Config)
             TextboxLabel.Size = UDim2.new(0.5, 0, 1, 0)
             TextboxLabel.Font = Enum.Font.Gotham
             TextboxLabel.Text = TextboxText
-            TextboxLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             TextboxLabel.TextSize = 14
             TextboxLabel.TextXAlignment = Enum.TextXAlignment.Left
             TextboxLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(TextboxLabel)
 
             local TextboxBg = Instance.new("Frame")
             TextboxBg.Parent = TextboxContainer
@@ -391,10 +438,10 @@ function Library:CreateWindow(WindowName, Config)
             TextBox.Font = Enum.Font.Gotham
             TextBox.PlaceholderText = Placeholder or ""
             TextBox.Text = ""
-            TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             TextBox.TextSize = 12
             TextBox.TextXAlignment = Enum.TextXAlignment.Left
             TextBox.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(TextBox)
 
             TextBox.FocusLost:Connect(function()
                 if Callback then Callback(TextBox.Text) end
@@ -416,8 +463,8 @@ function Library:CreateWindow(WindowName, Config)
             SearchIcon.Size = UDim2.new(0, 20, 1, 0)
             SearchIcon.Font = Enum.Font.GothamBold
             SearchIcon.Text = "🔍"
-            SearchIcon.TextColor3 = Color3.fromRGB(200, 200, 200)
             SearchIcon.TextSize = 14
+            ApplyTextColor(SearchIcon)
 
             local TextBox = Instance.new("TextBox")
             TextBox.Parent = SearchContainer
@@ -427,10 +474,10 @@ function Library:CreateWindow(WindowName, Config)
             TextBox.Font = Enum.Font.Gotham
             TextBox.PlaceholderText = Placeholder or "Search..."
             TextBox.Text = ""
-            TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             TextBox.TextSize = 14
             TextBox.TextXAlignment = Enum.TextXAlignment.Left
             TextBox.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(TextBox)
 
             TextBox:GetPropertyChangedSignal("Text"):Connect(function()
                 if Callback then Callback(TextBox.Text) end
@@ -455,10 +502,10 @@ function Library:CreateWindow(WindowName, Config)
             ToggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
             ToggleLabel.Font = Enum.Font.Gotham
             ToggleLabel.Text = ToggleText
-            ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             ToggleLabel.TextSize = 14
             ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
             ToggleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(ToggleLabel)
 
             local ToggleBg = Instance.new("Frame")
             ToggleBg.Parent = ToggleContainer
@@ -486,7 +533,6 @@ function Library:CreateWindow(WindowName, Config)
                 if Callback then Callback(CurrentState) end
             end
 
-            -- อัปเดตสี Toggle อัตโนมัติเมื่อเป็น Rainbow
             if isRainbow then
                 table.insert(ThemedElements, {
                     UpdateFunc = function(color)
@@ -520,10 +566,10 @@ function Library:CreateWindow(WindowName, Config)
             SliderLabel.Size = UDim2.new(0.5, 0, 0, 20)
             SliderLabel.Font = Enum.Font.Gotham
             SliderLabel.Text = SliderText
-            SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             SliderLabel.TextSize = 14
             SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
             SliderLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(SliderLabel)
 
             local ValueLabel = Instance.new("TextLabel")
             ValueLabel.Parent = SliderContainer
@@ -534,7 +580,7 @@ function Library:CreateWindow(WindowName, Config)
             ValueLabel.Text = tostring(CurrentValue)
             ValueLabel.TextSize = 14
             ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-            ApplyTheme(ValueLabel, "TextColor3")
+            ApplyTextColor(ValueLabel)
 
             local SliderBg = Instance.new("TextButton")
             SliderBg.Parent = SliderContainer
@@ -594,10 +640,10 @@ function Library:CreateWindow(WindowName, Config)
             DropdownBtn.Size = UDim2.new(1, 0, 0, 35)
             DropdownBtn.Font = Enum.Font.Gotham
             DropdownBtn.Text = "  " .. DropdownText .. " : Select Option"
-            DropdownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
             DropdownBtn.TextSize = 14
             DropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
             DropdownBtn.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(DropdownBtn)
 
             local ArrowLabel = Instance.new("TextLabel")
             ArrowLabel.Parent = DropdownBtn
@@ -627,9 +673,9 @@ function Library:CreateWindow(WindowName, Config)
             SearchBox.Font = Enum.Font.Gotham
             SearchBox.PlaceholderText = "Search in Dropdown..."
             SearchBox.Text = ""
-            SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             SearchBox.TextSize = 14
             SearchBox.TextTruncate = Enum.TextTruncate.AtEnd
+            ApplyTextColor(SearchBox)
 
             local OptionBtns = {}
 
@@ -671,9 +717,9 @@ function Library:CreateWindow(WindowName, Config)
                 OptionBtn.Size = UDim2.new(1, 0, 0, 30)
                 OptionBtn.Font = Enum.Font.Gotham
                 OptionBtn.Text = option
-                OptionBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
                 OptionBtn.TextSize = 14
                 OptionBtn.TextTruncate = Enum.TextTruncate.AtEnd
+                ApplyTextColor(OptionBtn)
                 table.insert(OptionBtns, OptionBtn)
                 
                 OptionBtn.MouseEnter:Connect(function() OptionBtn.BackgroundColor3 = Color3.fromRGB(95, 95, 95) end)
