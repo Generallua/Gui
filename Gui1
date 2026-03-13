@@ -1,67 +1,4 @@
 local Library = {}
-
-local Icons = {
-    home = "rbxassetid://6031265976",
-    settings = "rbxassetid://6031280882",
-    user = "rbxassetid://6031280883",
-    search = "rbxassetid://6031154871",
-    menu = "rbxassetid://6031091004",
-    close = "rbxassetid://6031094678",
-    check = "rbxassetid://6031094667",
-    plus = "rbxassetid://6031094677",
-    minus = "rbxassetid://6031094665",
-    edit = "rbxassetid://6031091007",
-    trash = "rbxassetid://6031090990",
-    lock = "rbxassetid://6031094670",
-    unlock = "rbxassetid://6031094669",
-    bell = "rbxassetid://6031094651",
-    mail = "rbxassetid://6031094662",
-    camera = "rbxassetid://6031094655",
-    image = "rbxassetid://6031094660",
-    video = "rbxassetid://6031094659",
-    play = "rbxassetid://6031094675",
-    pause = "rbxassetid://6031094673",
-    stop = "rbxassetid://6031094672",
-    refresh = "rbxassetid://6031094666",
-    download = "rbxassetid://6031094653",
-    upload = "rbxassetid://6031094654",
-    cloud = "rbxassetid://6031094656",
-    folder = "rbxassetid://6031094657",
-    file = "rbxassetid://6031094658",
-    map = "rbxassetid://6031094661",
-    location = "rbxassetid://6031094663",
-    compass = "rbxassetid://6031094652",
-    eye = "rbxassetid://6031094664",
-    eye_off = "rbxassetid://6031094668",
-    shield = "rbxassetid://6031094674",
-    star = "rbxassetid://6031094676",
-    heart = "rbxassetid://6031094650",
-    flag = "rbxassetid://6031094658",
-    gift = "rbxassetid://6031094659",
-    cart = "rbxassetid://6031094656",
-    tag = "rbxassetid://6031094671",
-    filter = "rbxassetid://6031094657",
-    sliders = "rbxassetid://6031094679",
-    cpu = "rbxassetid://6031094680",
-    database = "rbxassetid://6031094681",
-    terminal = "rbxassetid://6031094682",
-    code = "rbxassetid://6031094683",
-    activity = "rbxassetid://6031094684",
-    bar_chart = "rbxassetid://6031094685",
-    pie_chart = "rbxassetid://6031094686",
-    trending_up = "rbxassetid://6031094687",
-    trending_down = "rbxassetid://6031094688",
-    wifi = "rbxassetid://6031094689",
-    bluetooth = "rbxassetid://6031094690",
-    battery = "rbxassetid://6031094691",
-    sun = "rbxassetid://6031094692",
-    moon = "rbxassetid://6031094693",
-    zap = "rbxassetid://6031094694",
-    tool = "rbxassetid://6031094695",
-    wrench = "rbxassetid://6031094696",
-    hammer = "rbxassetid://6031094697"
-}
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -102,6 +39,7 @@ function Library:CreateWindow(WindowName, Config)
     local ToggleConfig = Config.ToggleConfig or {}
     local isFirstTab = true
     
+    -- [ระบบ Theme Color (สีของ UI)]
     local ThemeConfig = Config.ThemeColor or Color3.fromRGB(115, 196, 237)
     local isRainbow = false
     local CurrentThemeColor = Color3.fromRGB(115, 196, 237)
@@ -126,6 +64,7 @@ function Library:CreateWindow(WindowName, Config)
         end
     end
 
+    -- [ระบบ Text Color (สีของข้อความทั้งหมด)]
     local TextColorConfig = Config.TextColor or Color3.fromRGB(255, 255, 255)
     local isTextRainbow = false
     local CurrentTextColor = Color3.fromRGB(255, 255, 255)
@@ -151,6 +90,7 @@ function Library:CreateWindow(WindowName, Config)
         end
     end
 
+    -- Loop สำหรับสีรุ้ง
     if isRainbow or isTextRainbow then
         RunService.RenderStepped:Connect(function()
             local rColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
@@ -290,7 +230,7 @@ function Library:CreateWindow(WindowName, Config)
     ResizeBtn.Text = "◢"
     ResizeBtn.TextSize = 16
     ResizeBtn.ZIndex = 10
-    ApplyTheme(ResizeBtn, "TextColor3")
+    ApplyTheme(ResizeBtn, "TextColor3") -- อันนี้เป็นสัญลักษณ์ให้ใช้ Theme Color จะสวยกว่า
 
     local resizing = false
     local resizeStart, startSize
@@ -354,7 +294,7 @@ function Library:CreateWindow(WindowName, Config)
 
     local WindowElements = {}
 
-    function WindowElements:CreateCategory(CategoryName, IconName)
+    function WindowElements:CreateCategory(CategoryName)
         local CategoryElements = {}
 
         local CategoryBtn = Instance.new("TextButton")
@@ -369,20 +309,6 @@ function Library:CreateWindow(WindowName, Config)
         CategoryBtn.ZIndex = 3
         Instance.new("UICorner", CategoryBtn)
         ApplyTextColor(CategoryBtn)
-
-        if IconName and Icons[IconName] then
-            CategoryBtn.TextXAlignment = Enum.TextXAlignment.Left
-            local UIPad = Instance.new("UIPadding", CategoryBtn)
-            UIPad.PaddingLeft = UDim.new(0, 35)
-
-            local IconImg = Instance.new("ImageLabel")
-            IconImg.Parent = CategoryBtn
-            IconImg.BackgroundTransparency = 1
-            IconImg.Position = UDim2.new(0, -25, 0.5, -10)
-            IconImg.Size = UDim2.new(0, 20, 0, 20)
-            IconImg.Image = Icons[IconName]
-            ApplyTextColor(IconImg, "ImageColor3")
-        end
 
         local CategoryPage = Instance.new("ScrollingFrame")
         CategoryPage.Parent = ContentContainer
@@ -530,13 +456,15 @@ function Library:CreateWindow(WindowName, Config)
             SearchContainer.Size = UDim2.new(0.95, 0, 0, 35)
             Instance.new("UICorner", SearchContainer)
 
-            local SearchIcon = Instance.new("ImageLabel")
+            local SearchIcon = Instance.new("TextLabel")
             SearchIcon.Parent = SearchContainer
             SearchIcon.BackgroundTransparency = 1
-            SearchIcon.Position = UDim2.new(0, 10, 0.5, -10)
-            SearchIcon.Size = UDim2.new(0, 20, 0, 20)
-            SearchIcon.Image = Icons.search
-            ApplyTextColor(SearchIcon, "ImageColor3")
+            SearchIcon.Position = UDim2.new(0, 10, 0, 0)
+            SearchIcon.Size = UDim2.new(0, 20, 1, 0)
+            SearchIcon.Font = Enum.Font.GothamBold
+            SearchIcon.Text = "🔍"
+            SearchIcon.TextSize = 14
+            ApplyTextColor(SearchIcon)
 
             local TextBox = Instance.new("TextBox")
             TextBox.Parent = SearchContainer
@@ -717,13 +645,15 @@ function Library:CreateWindow(WindowName, Config)
             DropdownBtn.TextTruncate = Enum.TextTruncate.AtEnd
             ApplyTextColor(DropdownBtn)
 
-            local ArrowIcon = Instance.new("ImageLabel")
-            ArrowIcon.Parent = DropdownBtn
-            ArrowIcon.BackgroundTransparency = 1
-            ArrowIcon.Position = UDim2.new(1, -30, 0.5, -10)
-            ArrowIcon.Size = UDim2.new(0, 20, 0, 20)
-            ArrowIcon.Image = Icons.plus
-            ApplyTheme(ArrowIcon, "ImageColor3")
+            local ArrowLabel = Instance.new("TextLabel")
+            ArrowLabel.Parent = DropdownBtn
+            ArrowLabel.BackgroundTransparency = 1
+            ArrowLabel.Position = UDim2.new(1, -30, 0, 0)
+            ArrowLabel.Size = UDim2.new(0, 30, 1, 0)
+            ArrowLabel.Font = Enum.Font.GothamBold
+            ArrowLabel.Text = "+"
+            ArrowLabel.TextSize = 18
+            ApplyTheme(ArrowLabel, "TextColor3")
 
             local OptionList = Instance.new("Frame")
             OptionList.Parent = DropdownContainer
@@ -756,7 +686,7 @@ function Library:CreateWindow(WindowName, Config)
                 end
                 local targetHeight = isOpen and (65 + (visibleCount * 30)) or 35
                 TweenService:Create(DropdownContainer, TweenInfo.new(0.2), {Size = UDim2.new(0.95, 0, 0, targetHeight)}):Play()
-                ArrowIcon.Image = isOpen and Icons.minus or Icons.plus
+                ArrowLabel.Text = isOpen and "-" or "+"
             end
 
             DropdownBtn.MouseButton1Click:Connect(function()
