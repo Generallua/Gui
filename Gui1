@@ -71,8 +71,6 @@ local Icons = {
     ["award"] = "rbxassetid://10709769406",
     ["axe"] = "rbxassetid://10709769508",
     ["axis3d"] = "rbxassetid://10709769598",
-
-    -- ส่วนที่แก้ error
     ["code"] = "rbxassetid://10709810463",
     ["code2"] = "rbxassetid://10709810534",
     ["search"] = "rbxassetid://10709798350",
