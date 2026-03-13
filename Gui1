@@ -738,7 +738,7 @@ function Library:CreateWindow(WindowName, Config)
             ArrowIcon.BackgroundTransparency = 1
             ArrowIcon.Position = UDim2.new(1, -30, 0.5, -10)
             ArrowIcon.Size = UDim2.new(0, 20, 0, 20)
-            ArrowIcon.Image = Icons.plus
+            ArrowIcon.Image = "+"
             ApplyTheme(ArrowIcon, "ImageColor3")
 
             local OptionList = Instance.new("Frame")
@@ -772,7 +772,7 @@ function Library:CreateWindow(WindowName, Config)
                 end
                 local targetHeight = isOpen and (65 + (visibleCount * 30)) or 35
                 TweenService:Create(DropdownContainer, TweenInfo.new(0.2), {Size = UDim2.new(0.95, 0, 0, targetHeight)}):Play()
-                ArrowIcon.Image = isOpen and Icons.minus or Icons.plus
+                ArrowIcon.Image = isOpen and "-" or "+"
             end
 
             DropdownBtn.MouseButton1Click:Connect(function()
