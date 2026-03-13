@@ -1,7 +1,7 @@
 local Library = {}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+local CoreGui = (gethui and gethui()) or game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
 local function MakeDraggable(DraggableObject, TargetObject)
     TargetObject = TargetObject or DraggableObject
@@ -421,7 +421,7 @@ function Library:CreateWindow(WindowName, Config)
             end
 
             SliderBg.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch|Touch then
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     dragging = true
                     UpdateSlider(input)
                 end
