@@ -817,7 +817,7 @@ local Icons = {
 ["file-scan"] = "rbxassetid://10709885693",
 ["file-spreadsheet"] = "rbxassetid://10709885850",
 ["file-terminal"] = "rbxassetid://10709886007",
-["file-type"] = "rbxassetid://10709886164"
+["file-type"] = "rbxassetid://10709886164",
 }
 
 
