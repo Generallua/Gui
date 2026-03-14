@@ -1,5 +1,9 @@
 local Library = {}
 
+local Icons = loadstring(game:HttpGet(
+"https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua"
+))()
+
 local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local RunService = game:GetService("RunService") local CoreGui = (gethui and gethui()) or game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
 local function MakeDraggable(DraggableObject, TargetObject) TargetObject = TargetObject or DraggableObject local dragging, dragInput, dragStart, startPos
